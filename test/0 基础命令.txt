@@ -1,0 +1,106 @@
+不能把 TRACE 全部删除，否则需要对仪表重新校准
+
+************************************************************
+系统命令：
+
+*RST						// 复位仪表 P596，恢复出厂，校准会丢失
+
+*ESR?						// 查询事件状态寄存器索引  			P596
+*ESE 253					// 设置事件状态寄存器索引为 253		P596
+
+SYSTem:DISPlay:UPDate ONCE
+SYST:DISP:UPD ON			// 显示器显示
+SYST:DISP:UPD OFF			// 显示器不显示
+SYST:DISP:UPD ONCE			// 采样一次
+
+SYST:ERR:DISP ON			// 打开屏幕告警	P593
+SYST:ERR:DISP OFF			// 关闭屏幕告警
+
+************************************************************
+显示命令
+
+DISP:WIND1:STAT ON					// 打开 window 1，可以不用
+DISP:WIND1:TRAC1:Y:SCAL:AUTO ONCE	// 自动调整 Y 的刻度
+
+************************************************************
+射频控制：
+
+OUTP ON				// 射频输出打开
+OUTP OFF			// 射频输出关闭
+		
+DIAG:SERV:RFP OFF			// 关闭射频
+DIAG:SERV:RFP ON			// 打开射频
+
+SENS1:SWE:TYPE LIN			// 默认模式，扫描类型：线性频率扫描，配合后面的参数
+SENS1:SWE:TYPE LOG			// 扫描类型：对数频率扫描
+SENS1:SWE:TYPE SEGM			// 扫描类型：频率段扫描
+SENS1:SWE:TYPE POW			// 扫描类型：功率扫描
+SENS1:SWE:TYPE CW			// 扫描类型：时间扫描
+SENS1:SWE:TYPE POIN			// 时间扫描，参考 Trigger 设置
+SENS1:SWE:TYPE PULS			// 脉冲模式
+SENS1:SWE:TYPE IPH			// 相位模式
+SWE:POIN 200				// 扫描点数，最大60001
+
+
+例：
+SENS1:SWE:TYPE LIN			// 扫描类型：线性频率扫描，配合后面的参数
+SOUR1:POW -55				// 扫描输出功率 -45 dBm
+SENS1:FREQ:STAR 1GHZ		// 起始频率
+SENS1:FREQ:STOP 4000000000	// 终止频率
+
+SENSe:FREQuency:STARt 1GHZ 	// 设置扫描场景，包括 BAND FREQ-STAT、stop P597
+************************************************************
+CALC 命令
+
+CALC1:FORM MLOG				// 设置 Format 为 Log(幅值)		P154
+CALC1:FORM PHAS				// 设置 Format 为相位
+		   SMITH			// 史密斯
+		   POLar			// 极坐标
+		   GDEL				// 群时延
+		   SWR				// 传输参数
+
+CALC1:PAR:SEL 'Trc1'		// 选择 Trc1
+
+------------------------------------------------------
+MAKER 命令：
+
+CALCulate1:MARKer1:REFerence:X 4.5 GHz		// 显示 MARK1		p1107
+CALC1:MARK1:STAT ON			// 显示 MARK1		p1107
+CALC1:MARK1:AOFF				// 关闭所有 MARK
+CALC1:MARK1:DELT:STAT ON		// 设置参考 MARK
+CALC1:MARK1:REF:X 2.5 GHZ
+
+
+************************************************************
+TRACE 命令：
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S21'		// 增加 TRACE 1，测试 S21
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+CALC1:PAR:SDEF 'Trc2','S21'		// 增加 TRACE 1
+DISP:WIND2:STAT ON				// 打开窗口2
+DISP:WIND2:TRAC2:FEED 'Trc2'	// 显示 TRACE 2 命名 Trc2，显示到 WINDOW 2
+SENS2:SWE:TYPE IPH				// 扫描类型：线性频率扫描，配合后面的参数
+
+
+************************************************************
+MARK 命令：
+
+CALC1:PAR:SEL 'Trc1'			// 选择 Trc1
+CALC:MARK ON;					// 设置 MARK1，并显示		p1107
+CALC1:MARK:FORM?				// 查询 FORMAT，DEF：默认，P658
+CALC1:MARK1:X 2.2 GHz			// 设置 MARK1 在2.2G上
+CALC1:MARK1:Y?					// 查询 MARK1 的 Y 值
+
+例程：
+
+CALC1:PAR:SEL 'Trc1'			// 选择 Trc1
+CALC1:MARK1:STAT ON				// 显示 MARK1		p1107
+CALC1:MARK1:X 14.0 GHZ			// 设置参考 MARK 到扫描起始点
+CALC1:MARK1:Y?					// 查询 MARK1 的 Y 值
+
+
+
+************************************************************
+

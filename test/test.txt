@@ -1,0 +1,303 @@
+*RST						// 复位仪表 P596
+
+*ESR?						// 查询事件状态寄存器索引  			P596
+*ESE 253					// 设置事件状态寄存器索引为 253		P596
+
+SYST:DISP:UPD ON			// 显示器显示
+SYST:DISP:UPD OFF			// 显示器不显示
+
+SYST:ERR:DISP ON			// 打开屏幕告警	P593
+SYST:ERR:DISP OFF			// 关闭屏幕告警
+
+DIAG:SERV:RFP OFF			// 关闭射频
+DIAG:SERV:RFP ON			// 打开射频
+
+SENSe:FREQuency:STARt 1GHZ 	// 设置扫描场景，包括 BAND FREQ-STAT、stop P597
+
+CALC1:MARK ON;:CALC:MARK:FORM?	// 查询 FORMAT，DEF：默认，P658
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S21'		// 增加 TRACE 1，测试 S21
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+DISP:WIND1:STAT ON				// 打开 window 1，可以不用
+
+************************************************************
+SYST:DISP:UPD ON
+CALC1:MACK1000:STATU
+
+SYST:DISP:UPD ON
+SENS1:SWE:TYPE POW
+
+SENS1:AVER:COUN AVERCOUNT
+SENS1:AVER:COUN 10
+
+SENS1:AVER ON
+DIAG:SERV:RFP ON
+SENS1:FREQ:CW CWFREQ
+延迟100ms
+
+SOUR1:POW:STOP POWERSTOP
+SOUR1:POW:STOP 0
+
+延迟100ms
+CALC1:STAT:NLIN:COMP:LEV 1.000000E+0
+延迟100ms
+CALC1:STAT:NLIN:COMP:RES?
+
+
+CALC1:STAT:NLIN:COMP:LEV 1.000000E+0
+
+***************************************************************
+测试 P1，AVERCOUNT = 10, POWERSTOP = 0 CWFREQ = 1000000000
+
+# SYST:DISP:UPD ON
+# SENS1:SWE:TYPE POW
+# SENS1:AVER:COUN 10
+# SENS1:AVER ON
+# DIAG:SERV:RFP ON
+# SENS1:FREQ:CW 1000000000
+# SOUR1:POW:STOP 0
+# CALC1:STAT:NLIN:COMP:LEV 1.000000E+0
+# CALC1:STAT:NLIN:COMP:RES?
+# DIAG:SERV:RFP OFF
+OUTP OFF
+OUTP ON
+
+----------------------------------------------------
+测试例程：
+	注意，不能用衰减器直连，否则 返回值错误！
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S12'		// 增加 TRACE 1
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+SYST:DISP:UPD ON
+SENS1:SWE:TYPE POW
+SENS1:AVER:COUN 10
+SENS1:AVER ON
+DIAG:SERV:RFP ON
+SENS1:FREQ:CW 1000000000
+SOUR1:POW:STOP 0
+CALC1:STAT:NLIN:COMP:LEV 1.000000E+0
+CALC1:STAT:NLIN:COMP:RES?
+DIAG:SERV:RFP OFF
+
+***************************************************************
+测试 S参数
+
+SYST:DISP:UPD ON
+SENS1:SWE:TYPE LIN
+SENS1:FREQ:STAR STARTFREQ
+SENS1:FREQ:STOP STOPFREQ
+SOUR1:POW POWERIN
+CALC1:PAR:SDEF 'Trc2','S11'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC2:FEED 'Trc2'
+CALC1:PAR:SDEF 'Trc3','S12'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC3:FEED 'Trc3'
+CALC1:PAR:SDEF 'Trc4','S22'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC4:FEED 'Trc4'
+
+SYST:DISP:UPD ON
+SENS1:SWE:TYPE LIN
+SENS1:FREQ:STAR 1000000000
+SENS1:FREQ:STOP 4000000000
+SOUR1:POW -20
+CALC1:PAR:SDEF 'Trc2','S11'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC2:FEED 'Trc2'
+CALC1:PAR:SDEF 'Trc3','S12'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC3:FEED 'Trc3'
+CALC1:PAR:SDEF 'Trc4','S22'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC4:FEED 'Trc4'
+
+# SYST:DISP:UPD ON
+# SENS1:SWE:TYPE LIN
+# SENS1:FREQ:STAR 1000000000
+# SENS1:FREQ:STOP 4000000000
+# SOUR1:POW -20
+# CALC1:PAR:SDEF 'Trc2','S11'
+# DISP:WIND1:STAT ON;:DISP:WIND1:TRAC2:FEED 'Trc2'
+# CALC1:PAR:SDEF 'Trc3','S12'
+# DISP:WIND1:STAT ON;:DISP:WIND1:TRAC3:FEED 'Trc3'
+# CALC1:PAR:SDEF 'Trc4','S22'
+# DISP:WIND1:STAT ON;:DISP:WIND1:TRAC4:FEED 'Trc4'
+
+**************************************************************************
+天线校准
+
+*RST							// 复位仪表 P596
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S21'		// 增加 TRACE 1
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+***************************************************************
+TEST
+
+*RST						// 复位
+CALC1:PAR:DEL:ALL			// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S12'		// 增加 TRACE 1
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+
+SYST:DISP:UPD ON
+SENS1:SWE:TYPE LIN
+SENS1:FREQ:STAR 1000000000
+SENS1:FREQ:STOP 4000000000
+SOUR1:POW -40
+CALC1:PAR:SDEF 'Trc2','S11'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC2:FEED 'Trc2'
+CALC1:PAR:SDEF 'Trc3','S12'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC3:FEED 'Trc3'
+CALC1:PAR:SDEF 'Trc4','S22'
+DISP:WIND1:STAT ON;:DISP:WIND1:TRAC4:FEED 'Trc4'
+
+
+*RST;
+#CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+#CALC1:PAR:SDEF 'Trc1','S12'	// 增加 TRACE 1
+#DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+CALC1：DATA?
+
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S12'		// 增加 TRACE 1
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+CALC1:MARK ON;:CALC:MARK:FORM?	// 查询 FORMAT，DEF：默认，P658
+
+SENS:BAND 10K:FREQ:STARt 1GHZ:FREQ:STOP 2GHZ 	// 设置扫描场景，包括 BAND FREQ-STAT、stop P597
+
+
+# SENS:FREQ:STARt 2GHZ:CW 1GHZ 	// 设置扫描场景, 包括 BAND FREQ-STAT, stop P597
+SENS:FREQ:START?
+
+***************************************************************
+test 2020年4月28日
+
+*RST							// 复位仪表 P596
+DIAG:SERV:RFP ON			// 打开射频
+#CALC1:MARK ON
+#CALC:MARK:FORM?			// 查询 FORMAT，DEF：默认，P658
+
+SENS1:SWE:TYPE LIN			// 扫描类型：线性频率扫描，配合后面的参数
+SOUR1:POW -25				// 扫描输出功率 -45 dBm
+SENS1:FREQ:STAR 1GHZ		// 起始频率
+SENS1:FREQ:STOP 4000000000	// 终止频率
+SWE:POIN 200				// 扫描点数
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S21'		// 增加 TRACE 1
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+CALC1:PAR:SDEF 'Trc2','S21'		// 增加 TRACE 1
+DISP:WIND2:STAT ON				// 打开窗口2
+DISP:WIND2:TRAC2:FEED 'Trc2'	// 显示 TRACE 2 命名 Trc2，显示到 WINDOW 2
+#SENS2:SWE:TYPE IPH				// 扫描类型：线性频率扫描，配合后面的参数
+CALC1:PAR:SEL 'Trc1'			// 选择 Trc1
+CALC1:FORM PHAS					// 设置 Format 为相位
+CALC1:FORM MLOG					// 设置 Format 为 Log(幅值)		P154
+
+CALC1:MARK1:STAT ON			// 显示 MARK1		p1107
+CALC1:MARK1:DELT:STAT ON		// 设置参考 MARK
+CALC1:MARK1:REF:X 3.5 GHZ		// 设置参考 MARK 到扫描起始点
+CALC1:MARK1:Y? 
+
+#CALCulate1:MARKer1:FUNCtion:EXECute MIN; RES? 	// 查询 MARK 位置
+
+SYSTem:DISPlay:UPDate ONCE
+#SYSTem:DISPlay:UPDate ON
+
+***************************************************************
+#SYSTem:DISPlay:UPDate ONCE
+#SYSTem:DISPlay:UPDate ON
+CALC:MARK1:AOFF				// 关闭所有 MARK
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S21'		// 增加 TRACE 1，测试 S21
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+SENS1:SWE:TYPE LIN			// 扫描类型：线性频率扫描，配合后面的参数
+SOUR1:POW -25				// 扫描输出功率 -45 dBm
+SENS1:FREQ:STAR 1GHZ		// 起始频率
+SENS1:FREQ:STOP 4000000000	// 终止频率
+SWE:POIN 200				// 扫描点数
+
+DISP:WIND1:TRAC1:Y:SCAL:AUTO ONCE
+
+CALC1:PAR:SEL 'Trc1'		// 选择 Trc1
+CALC1:MARK1:STAT ON			// 显示 MARK1		p1107
+CALC1:MARK1:DELT:STAT ON		// 设置参考 MARK
+CALC1:MARK1:REF:X 2.5 GHZ
+SYST:DISP:UPD ONCE			// 采样一次
+CALCulate1:MARKer1:FUNCtion:EXECute MIN; RES? 	// 查询 MARK 位置
+#SYST:DISP:UPD ON			// 采样一次
+SYST:DISP:UPD ONCE			// 采样一次
+
+***************************************************************
+2020年4月29日
+
+#*RST							// 复位仪表 P596
+DIAG:SERV:RFP ON			// 打开射频
+#CALC1:MARK ON
+#CALC:MARK:FORM?			// 查询 FORMAT，DEF：默认，P658
+
+SENS1:SWE:TYPE LIN			// 扫描类型：线性频率扫描，配合后面的参数
+SOUR1:POW -25				// 扫描输出功率 -45 dBm
+SENS1:FREQ:STAR 1GHZ		// 起始频率
+SENS1:FREQ:STOP 4000000000	// 终止频率
+SWE:POIN 200				// 扫描点数
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S21'		// 增加 TRACE 1
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+CALC1:PAR:SDEF 'Trc2','S21'		// 增加 TRACE 1
+DISP:WIND2:STAT ON				// 打开窗口2
+DISP:WIND2:TRAC2:FEED 'Trc2'	// 显示 TRACE 2 命名 Trc2，显示到 WINDOW 2
+#SENS2:SWE:TYPE IPH				// 扫描类型：线性频率扫描，配合后面的参数
+CALC1:PAR:SEL 'Trc1'			// 选择 Trc1
+CALC1:FORM PHAS					// 设置 Format 为相位
+#CALC1:FORM MLOG					// 设置 Format 为 Log(幅值)		P154
+
+CALC1:MARK1:STAT ON				// 显示 MARK1		p1107
+CALC1:MARK1:X 3.5 GHZ			// 设置参考 MARK 到扫描起始点
+CALC1:MARK1:Y?
+
+CALC1:PAR:SEL 'Trc2'			// 选择 Trc1
+CALC1:MARK2:STAT ON				// 显示 MARK1		p1107
+CALC1:MARK2:X 3.5 GHZ			// 设置参考 MARK 到扫描起始点
+CALC1:MARK2:Y?
+
+***************************************************************
+2020年4月29日 ok
+
+#*RST						// 复位仪表 P596
+DIAG:SERV:RFP ON			// 打开射频
+#CALC1:MARK ON
+#CALC:MARK:FORM?			// 查询 FORMAT，DEF：默认，P658
+
+SENS1:SWE:TYPE LIN			// 扫描类型：线性频率扫描，配合后面的参数
+SOUR1:POW -25				// 扫描输出功率 -45 dBm
+SENS1:FREQ:STAR 13.9 GHZ	// 起始频率
+SENS1:FREQ:STOP 14100000000	// 终止频率
+SWE:POIN 200				// 扫描点数
+
+CALC1:PAR:DEL:ALL				// 删除所有的 TRACE
+CALC1:PAR:SDEF 'Trc1','S21'		// 增加 TRACE 1
+DISP:WIND1:TRAC1:FEED 'Trc1'	// 显示 TRACE 1 命名 Trc1，显示到 WINDOW 1
+
+CALC1:PAR:SDEF 'Trc2','S21'		// 增加 TRACE 1
+DISP:WIND2:STAT ON				// 打开窗口2
+DISP:WIND2:TRAC2:FEED 'Trc2'	// 显示 TRACE 2 命名 Trc2，显示到 WINDOW 2
+#SENS2:SWE:TYPE IPH				// 扫描类型：线性频率扫描，配合后面的参数
+CALC1:PAR:SEL 'Trc1'			// 选择 Trc1
+CALC1:FORM PHAS					// 设置 Format 为相位
+#CALC1:FORM MLOG				// 设置 Format 为 Log(幅值)		P154
+
+CALC1:MARK1:STAT ON				// 显示 MARK1		p1107
+CALC1:MARK1:X 14.0 GHZ			// 设置参考 MARK 到扫描起始点
+CALC1:MARK1:Y?					// 查询 MARK1 的 Y 值
+
+CALC1:PAR:SEL 'Trc2'			// 选择 Trc1
+CALC1:MARK2:STAT ON				// 显示 MARK1		p1107
+CALC1:MARK2:X 14.0 GHZ			// 设置参考 MARK 到扫描起始点
+CALC1:MARK2:Y?					// 查询 MARK1 的 Y 值
+
