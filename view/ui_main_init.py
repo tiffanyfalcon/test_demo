@@ -6,18 +6,20 @@
 #
 #
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStatusBar
-from PyQt5.QtGui import QTextCursor
+import logging
+
 from PyQt5 import QtCore
-import time
+from PyQt5.QtGui import QTextCursor
+from PyQt5.QtWidgets import QMainWindow
+
+from lib.myLog import MyLog, DbgMod
+from lib.remoteGet import ZVA, RSRFSin
+from view.M_thread import MyThread
+from view.ui_main import Ui_MainWindow
+
+
 # from PyQt5.QtCore import QTimer
 # from PyQt5.Qt import QQEvent import QMouseEvent
-
-from view.ui_main import Ui_MainWindow
-from view.M_thread import MyThread
-from lib.remoteGet import ZVA
-import logging
-from lib.myLog import MyLog, DbgMod
 
 
 # def ui_init(self, MainWindow, str_ver):
@@ -42,8 +44,10 @@ class MyWindow(QMainWindow, Ui_MainWindow ):
         # ---- 初始化 -------------------------------------------------------------------
 
         # self.myZva = ZVA("ZVB8", "C:/Users/BRJX/Desktop/a")        # 初始化仪表
-        # self.myZva = ZVA('ZNB20', 'C:/Users/BRJX/Desktop/a', '192.168.1.20')        # 初始化仪表
-        self.myZva = ZVA('ZVA50', 'C:/Users/BRJX/Desktop/a', '192.168.1.15')        # 初始化仪表
+        self.myZva = ZVA('ZNB20', 'C:/Users/BRJX/Desktop/a', '192.168.1.20')        # 初始化仪表 － 空工矢网
+        # self.myZva = ZVA('ZVA50', 'C:/Users/BRJX/Desktop/a', '192.168.1.15')        # 初始化仪表 － 公司矢网
+
+        self.myRSRFSin = RSRFSin('SMF', '192.168.1.121')           # 初始化仪表 － 空工信号源
 
         # 初始化 日志
         logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s : %(message)s",
@@ -83,6 +87,8 @@ class MyWindow(QMainWindow, Ui_MainWindow ):
 
         # ---- 控件状态 -------------------------------------------------------------------
         self.bt_3_linked = False
+        self.bt_7_linked = False
+        self.bt_8_linked = False
         self.bt_6_rfctrl_on = False
 
         self.bt_4_begin.setEnabled(False)
@@ -129,27 +135,33 @@ class MyWindow(QMainWindow, Ui_MainWindow ):
             if self.myZva.linkState == 1:                           # 连接成功
                 logging.debug("ZVA connect ok")
                 self.bt_3_linked = True
-                self.bt_3_link.setText("断开仪表")
+                self.bt_3_link.setText("断开矢网")
                 # print("link ZVA ok")
-                self.bt_3_link.setText("断开连接")
                 self.label_3_link.setText("ZVA 已连接")
 
                 self.bt_4_begin.setEnabled(True)
                 self.bt_5_send.setEnabled(True)
                 self.bt_6_rfctrl.setEnabled(True)
+
                 if self.bt_6_rfctrl_on:
                     self.bt_6_rfctrl.setStyleSheet(self.color_bt_on)
                 else:
                     self.bt_6_rfctrl.setStyleSheet(self.color_bt_off)
 
+                self.bt_7_link_smf.setEnabled(False)
+                self.bt_8_link_fsw.setEnabled(False)
+
             else:                                                   # 连接失败
                 # print("link ZVA error!")
-                self.bt_3_link.setText("断开连接")
-                self.label_3_link.setText("连接仪表")
+                self.bt_3_link.setText("连接矢网")
+                self.label_3_link.setText("连接矢网")
                 self.bt_4_begin.setEnabled(False)
                 self.bt_5_send.setEnabled(False)
                 self.bt_6_rfctrl.setEnabled(False)
                 self.bt_6_rfctrl.setStyleSheet(self.color_bt_disable)
+
+                self.bt_7_link_smf.setEnabled(True)
+                self.bt_8_link_fsw.setEnabled(True)
 
                 logging.debug("connect ZVA error")
 
@@ -172,8 +184,11 @@ class MyWindow(QMainWindow, Ui_MainWindow ):
             self.bt_6_rfctrl.setEnabled(False)
             self.bt_6_rfctrl.setStyleSheet(self.color_bt_disable)
 
-            if self.myZva.linkState == 1:
+            if self.myZva.linkState == 1:           # 已连接，断开连接
                 self.myZva.close_inst()
+
+            self.bt_7_link_smf.setEnabled(True)
+            self.bt_8_link_fsw.setEnabled(True)
 
     def bt_4_begin_click(self):
         # self.myZva.mark_data()
@@ -181,34 +196,158 @@ class MyWindow(QMainWindow, Ui_MainWindow ):
 
         self.mylog.logout(DbgMod.DEBUG, str(a))
 
+    # ---- 发送指令 --------------------------------------------
     def bt_5_send_click(self):
-        str_utf = self.te_2_send.toPlainText().encode('utf-8')
-        str_a = str_utf.decode('utf-8')
-        try:
-            val = self.myZva.send_cmd(str_a)
-            self.mylog.logout(DbgMod.DEBUG, val)
-        except Exception as e:
-            self.mylog.logout(DbgMod.DEBUG, e)
 
+        global str_rf_isOn
+
+        str_utf = self.te_2_send.toPlainText().encode('utf-8')      # 转为 utf-8
+        str_a = str_utf.decode('utf-8')                             # 变为 ANSI
+
+        try:
+            if self.bt_3_linked:
+                val = self.myZva.send_cmd(str_a)
+                str_rf_isOn = self.myZva.send_cmd('OUTP?')
+
+                self.mylog.logout(DbgMod.DEBUG, val)
+
+            elif self.bt_7_linked:
+                val = self.myRSRFSin.send_cmd(str_a)
+                str_rf_isOn = int(str(self.myRSRFSin.send_cmd('OUTP?').split(':')[-1]).strip())
+
+                self.mylog.logout(DbgMod.DEBUG, val)
+                # self.mylog.logout(DbgMod.DEBUG, str(str_rf_isOn))
+
+            if str_rf_isOn == 1:           # 射频已打开
+                self.bt_6_rfctrl_on = True
+            else:
+                self.bt_6_rfctrl_on = False
+
+            self.bt_6_set_state()
+
+        except Exception as e:
+            self.mylog.logout(DbgMod.DEBUG, str(e))
+
+    # ---- 射频开关 -------------------------------------------
     def bt_6_rfctrl_click(self):
 
         try:
-            if self.bt_6_rfctrl_on:
+            if self.bt_6_rfctrl_on:                         # 射频 已打开
                 self.bt_6_rfctrl_on = False
-                self.bt_6_rfctrl.setText('RF OFF')
-                self.bt_6_rfctrl.setStyleSheet(self.color_bt_off)
-                str_cmd = 'OUTP OFF'
-                self.myZva.send_cmd(str_cmd)
 
-            else:
+                if self.bt_3_linked:                        # 矢网 已连接
+                    str_cmd = 'OUTP OFF'
+                    self.myZva.send_cmd(str_cmd)
+
+                elif self.bt_7_linked:                      # 信号源 已连接
+                    str_cmd = 'OUTP:ALL OFF'
+                    self.myRSRFSin.send_cmd(str_cmd)
+
+            else:                                          # 射频 已关闭
                 self.bt_6_rfctrl_on = True
-                self.bt_6_rfctrl.setText('RF ON')
-                self.bt_6_rfctrl.setStyleSheet(self.color_bt_on)
-                str_cmd = 'OUTP ON'
-                self.myZva.send_cmd(str_cmd)
+
+                if self.bt_3_linked:                        # 矢网
+                    str_cmd = 'OUTP ON'
+                    self.myZva.send_cmd(str_cmd)
+
+                elif self.bt_7_linked:                      # 信号源
+                    str_cmd = 'OUTP:ALL ON'
+                    self.myRSRFSin.send_cmd(str_cmd)
+
+            self.bt_6_set_state()
 
         except Exception as e:
             self.mylog.log_error(str(e))
+
+    def bt_6_set_state(self):
+        if self.bt_6_rfctrl_on:                         # 射频 已打开
+            self.bt_6_rfctrl.setText('RF ON')
+            self.bt_6_rfctrl.setStyleSheet(self.color_bt_on)
+
+        else:                                          # 射频 已关闭
+            self.bt_6_rfctrl.setText('RF OFF')
+            self.bt_6_rfctrl.setStyleSheet(self.color_bt_off)
+
+    # ---- 信号源 连接 -------------------------------------
+    def bt_7_link_smf_click(self):
+
+        # 互斥操作 --------------------------
+        if self.bt_3_linked:
+            self.bt_3_link.click()
+
+        if self.bt_8_linked:
+            self.bt_8_lin_fsw_click()
+        # 操作 --------------------------
+        if not self.bt_7_linked:        # 未连接状态，开始连接
+
+            self.myRSRFSin.open_inst()
+
+            if self.myRSRFSin.linkState == 1:                           # 连接成功
+                logging.debug("SMF connect ok")
+                self.bt_7_linked = True
+                # print("link ZVA ok")
+                self.bt_7_link_smf.setText("断开信号源")
+
+                self.bt_4_begin.setEnabled(True)
+                self.bt_5_send.setEnabled(True)
+                self.bt_6_rfctrl.setEnabled(True)
+
+                # ---- 读取射频开关状态 --------------
+                str_smr_rf_isOn = int(str(self.myRSRFSin.send_cmd('OUTP?').split(':')[-1]).strip())
+
+                if str_smr_rf_isOn == 1:  # 射频已打开
+                    self.bt_6_rfctrl_on = True
+                else:
+                    self.bt_6_rfctrl_on = False
+
+                # ---- 设置开关颜色 --------------------
+                self.bt_6_set_state()
+
+                self.bt_3_link.setEnabled(False)
+                self.bt_8_link_fsw.setEnabled(False)
+
+                self.mylog.log_ok("mylog: connect SMF ok")
+
+            else:                                                   # 连接失败
+                # print("link ZVA error!")
+                self.bt_7_link_smf.setText("连接信号源")
+                self.bt_4_begin.setEnabled(False)
+                self.bt_5_send.setEnabled(False)
+                self.bt_6_rfctrl.setEnabled(False)
+                self.bt_6_rfctrl.setStyleSheet(self.color_bt_disable)
+
+                self.bt_3_link.setEnabled(True)
+                self.bt_8_link_fsw.setEnabled(True)
+
+                logging.debug("connect SMF error")
+
+                try:
+                    # self.mylog.logout(DbgMod.DEBUG, "mylog: connect ZVA error")
+                    self.mylog.log_error("mylog: connect SMF error")
+                except Exception as e:
+                    print(e)
+
+        else:                               # 当前是已连接状态，断开连接
+            if self.bt_6_rfctrl_on:
+                self.bt_6_rfctrl.click()            # 关闭射频
+
+            self.bt_7_linked = False
+            self.bt_7_link_smf.setText("连接信号源")
+            self.bt_4_begin.setEnabled(False)
+            self.bt_5_send.setEnabled(False)
+
+            self.bt_6_rfctrl.setEnabled(False)
+            self.bt_6_rfctrl.setStyleSheet(self.color_bt_disable)
+
+            self.bt_3_link.setEnabled(True)
+            self.bt_8_link_fsw.setEnabled(True)
+
+            if self.myRSRFSin.linkState == 1:
+                self.myRSRFSin.close_inst()
+
+    # ---- 连接 频谱仪 ---------------------
+    def bt_8_lin_fsw_click(self):
+        pass
 
     # def delay_time(self):
     #     time.sleep(5)

@@ -138,7 +138,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>连接仪表</string>
+     <string>连接矢网</string>
     </property>
     <property name="checkable">
      <bool>false</bool>
@@ -148,7 +148,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>60</y>
+      <y>500</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -177,7 +177,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>70</y>
+      <y>510</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -287,6 +287,38 @@
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="bt_7_link_smf">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>连接信号源</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="bt_8_link_fsw">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>连接频谱仪</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -319,12 +351,12 @@
    <slot>bt_test_click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>740</x>
+     <x>370</x>
      <y>563</y>
     </hint>
     <hint type="destinationlabel">
-     <x>636</x>
-     <y>256</y>
+     <x>412</x>
+     <y>575</y>
     </hint>
    </hints>
   </connection>
@@ -335,12 +367,12 @@
    <slot>bt_test_2_click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>458</x>
+     <x>700</x>
      <y>563</y>
     </hint>
     <hint type="destinationlabel">
-     <x>723</x>
-     <y>314</y>
+     <x>693</x>
+     <y>576</y>
     </hint>
    </hints>
   </connection>
@@ -355,7 +387,7 @@
      <y>58</y>
     </hint>
     <hint type="destinationlabel">
-     <x>207</x>
+     <x>175</x>
      <y>57</y>
     </hint>
    </hints>
@@ -368,11 +400,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>77</x>
-     <y>100</y>
+     <y>553</y>
     </hint>
     <hint type="destinationlabel">
-     <x>208</x>
-     <y>99</y>
+     <x>116</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -387,8 +419,8 @@
      <y>278</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>177</y>
+     <x>702</x>
+     <y>320</y>
     </hint>
    </hints>
   </connection>
@@ -399,12 +431,44 @@
    <slot>bt_6_rfctrl_click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>422</x>
-     <y>280</y>
+     <x>370</x>
+     <y>293</y>
     </hint>
     <hint type="destinationlabel">
      <x>387</x>
      <y>278</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bt_7_link_smf</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bt_7_link_smf_click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>93</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>173</x>
+     <y>109</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bt_8_link_fsw</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bt_8_lin_fsw_click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>157</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>169</x>
+     <y>160</y>
     </hint>
    </hints>
   </connection>
@@ -416,5 +480,7 @@
   <slot>bt_4_begin_click()</slot>
   <slot>bt_5_send_click()</slot>
   <slot>bt_6_rfctrl_click()</slot>
+  <slot>bt_7_link_smf_click()</slot>
+  <slot>bt_8_lin_fsw_click()</slot>
  </slots>
 </ui>

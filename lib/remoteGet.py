@@ -1,5 +1,7 @@
-import visa
 import time
+
+import visa
+
 
 #日期：2019年08月24日
 #版本：V1.0
@@ -274,7 +276,7 @@ class ZVA:
                         return -2
         return 0
 
-    #删除频道及trace
+    # 删除频道及trace
     def delete_ch(self,ch):
         if type(ch) != str:
             ch = str(ch)
@@ -328,7 +330,7 @@ class ZVA:
                                 rt_v = self.instance.write(cmd_real)
 
                             print(str(rt_v))
-                            str_temp += 'i = %s %s\n' % (i, rt_v)
+                            str_temp += 'i = %s : %s\n' % (i, rt_v)
                             time.sleep(0.2)
 
                             break
@@ -407,32 +409,89 @@ class RSFSx:
                         except BaseException:
                             return -2
 
+    # ---- 发送 -------------------------------------------------------------------------
+    def send_cmd(self, str_cmds):
+        a = self.cmd_tx(str_cmds)
+        return a
+
+    def cmd_tx(self, str_cmds):
+        str_temp = ''
+
+        i = 0
+        for cmd in str(str_cmds).split('\n'):
+            try:
+                # // 为注释，# 为注释，只取一行中的前面的命令
+                if cmd and cmd.strip() and cmd.strip()[0:2] != '//' and cmd.strip()[0] != '#':
+                    for cmd_real in str(cmd).split('//'):
+
+                        # // 为注释，# 为注释，只取一行中的前面的命令
+                        if cmd_real and str(cmd_real).strip() and cmd_real[0] != '//':
+                            i += 1
+                            # print(cmd)
+                            if cmd_real.strip()[-1] == '?':              # 查询命令
+                                rt_v = self.instance.query(cmd_real)
+                                print("query: %s" % str(cmd_real).strip())
+                            else:                               # 配置命令
+                                print("set: %s" % str(cmd_real).strip())
+                                rt_v = self.instance.write(cmd_real)
+
+                            print(str(rt_v))
+                            str_temp += 'i = %s : %s\n' % (i, rt_v)
+                            time.sleep(0.2)
+
+                            break
+
+            except Exception as e:
+                return str(e)
+
+        return str_temp
+
 
 # ==== 信号源 =====================================================================================
 # 罗德信号源系列
 class RSRFSin:
-    def __init__(self,devName):
+    def __init__(self, dev_name, tcp_addr):
+        self.dev_name = dev_name
+        self.tcp_addr = 'TCPIP0::' + tcp_addr + '::inst0::INSTR'
         self.linkState = 0
 
-        if(devName == 'SMW200A'):
-            self.tcp_addr = 'TCPIP0::192.168.1.120::inst0::INSTR'
+    def open_inst(self):
+
+        if self.dev_name == 'SMW200A':
+            # self.tcp_addr = 'TCPIP0::192.168.1.120::inst0::INSTR'
+
             rm1 = visa.ResourceManager()
             try:
                 self.instance = rm1.open_resource(self.tcp_addr)
-            except BaseException:
+            except Exception as e:
                 self.linkState = 0
+                print(str(e))
             else:
                 self.linkState = 1
 
-        if(devName == 'SMF'):
-            self.tcp_addr = 'TCPIP0::192.168.1.121::inst0::INSTR'
+        if self.dev_name == 'SMF':
+            # self.tcp_addr = 'TCPIP0::192.168.1.121::inst0::INSTR'
+
             rm1 = visa.ResourceManager()
             try:
                 self.instance = rm1.open_resource(self.tcp_addr)
-            except BaseException:
+            except BaseException as e:
                 self.linkState = 0
+                print(str(e))
             else:
                 self.linkState = 1
+
+    # ---- 关闭 ---------------------------------------------------------------------
+    def close_inst(self):
+        try:
+            str_temp = ''
+            cmd = 'OUTP OFF'
+            str_temp = self.send_cmd(cmd)
+
+            str_temp += str(self.instance.close())
+            return str_temp
+        except Exception as e:
+            return str(e)
 
     # 信号源输出控制功能，设置RFFREQ（期望输出频率值）、POWVALUE（期望输出功率值）、IQSTATE（IQ信号开关）、RFOUTSTATE（信号输出控制参数，ON为开，OFF为关），
     # 配置正常则返回0，其余返回值详见错误代码表
@@ -463,6 +522,42 @@ class RSRFSin:
                     except BaseException:
                         return -2
         return 0
+
+    def send_cmd(self, str_cmds):
+        a = self.cmd_tx(str_cmds)
+        return a
+
+    def cmd_tx(self, str_cmds):
+        str_temp = ''
+
+        i = 0
+        for cmd in str(str_cmds).split('\n'):
+            try:
+                # // 为注释，# 为注释，只取一行中的前面的命令
+                if cmd and cmd.strip() and cmd.strip()[0:2] != '//' and cmd.strip()[0] != '#':
+                    for cmd_real in str(cmd).split('//'):
+
+                        # // 为注释，# 为注释，只取一行中的前面的命令
+                        if cmd_real and str(cmd_real).strip() and cmd_real[0] != '//':
+                            i += 1
+                            # print(cmd)
+                            if cmd_real.strip()[-1] == '?':              # 查询命令
+                                rt_v = self.instance.query(cmd_real)
+                                print("query: %s" % str(cmd_real).strip())
+                            else:                               # 配置命令
+                                print("set: %s" % str(cmd_real).strip())
+                                rt_v = self.instance.write(cmd_real)
+
+                            print(str(rt_v))
+                            str_temp += 'i = %s : %s\n' % (i, rt_v)
+                            time.sleep(0.2)
+
+                            break
+
+            except Exception as e:
+                return str(e)
+
+        return str_temp
 
 
 # ==== 万用表 =====================================================================================
