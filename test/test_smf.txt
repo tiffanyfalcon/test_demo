@@ -1,0 +1,25 @@
+# SOUR1:IQ:STAT IQSTATE		// 不成功
+# SOUR1:IQ:STAT ON			// 不成功
+# OUTP1 RFOUTSTATE ON		// 不成功
+
+SOUR1:FREQ RFFREQ
+SOUR1:POW POWVALUE
+SOUR1:IQ:STAT IQSTATE
+OUTP1 RFOUTSTATE
+
+
+SOUR1:FREQ 1000000000		// 设置频率 1G
+SOUR1:FREQ 1 GHz			// 设置频率 1G
+SOUR1:POW -35				// 功率 -35 dBm
+#OUTP:ALL ON					// 射频输出打开
+OUTP:ALL OFF					// 射频输出打开
+
+SOUR1:LFO1:BAND BW10M		// 设置带宽 10M
+SOUR1:LFO1:BAND BW0M2		// 设置带宽 200k
+
+*************************************************************************
+#SOUR1:FREQ 1000000000		// 设置频率 1G
+SOUR1:FREQ 1.2 GHz			// 设置频率 1G
+SOUR1:POW -15				// 功率 -35 dBm
+OUTP:ALL ON					// 射频输出打开
+#OUTP:ALL OFF					// 射频输出打开

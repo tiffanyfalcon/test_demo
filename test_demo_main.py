@@ -3,16 +3,19 @@
 # import visa
 
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets, QtSql
+
+from PyQt5 import QtWidgets
+
 from view.ui_main_init import MyWindow
+
 # from PyQt5.QtCore import *
 # from PyQt5.QtWidgets import QApplication, QMainWindow
 # from view import ui_main
 # import view.ui_main
 
 
-str_version         = " V1.05"
-str_date            = " 2020-04-24"
+str_version         = " V1.06"
+str_date            = " 2020-05-01"
 str_auther          = " ChenXudong"
 str_company         = " Xian BRJX"
 str_software_name   = " Near Feild Test"
