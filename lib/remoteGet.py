@@ -345,28 +345,63 @@ class ZVA:
 # 罗德频谱仪系列
 class RSFSx:
     #
-    def __init__(self,devName):
+    def __init__(self, dev_name, tcp_addr):
+        self.dev_name = dev_name
+        self.tcp_addr = 'TCPIP0::' + tcp_addr + '::inst0::INSTR'
         self.linkState = 0
-        if(devName == 'FSWP'):
-            self.tcp_addr = 'TCPIP0::FSWP26-101228::inst0::INSTR'
+
+
+    # ---- 打开 -----------------------------------------------------
+    def open_inst(self):
+
+        # ---- FSWP 系列 频谱仪 ----------------------------
+        if self.dev_name == 'FSW':
             rm1 = visa.ResourceManager()
+
             try:
                 self.instance = rm1.open_resource(self.tcp_addr)
-            except BaseException:
+            except BaseException as e:
                 self.linkState = 0
+                print(str(e))
             else:
                 self.linkState = 1
 
-        if(devName == 'FSV'):
-            self.tcp_addr = 'TCPIP0::192.168.1.81::inst0::INSTR'
+        # ---- FSWP 系列 频谱仪 ----------------------------
+        if self.dev_name == 'FSWP':
             rm1 = visa.ResourceManager()
+
             try:
                 self.instance = rm1.open_resource(self.tcp_addr)
-            except BaseException:
+            except BaseException as e:
                 self.linkState = 0
+                print(str(e))
             else:
                 self.linkState = 1
 
+        # ---- FSV 系列 频谱仪 ----------------------------
+        if self.dev_name == 'FSV':
+            rm1 = visa.ResourceManager()
+
+            try:
+                self.instance = rm1.open_resource(self.tcp_addr)
+            except BaseException as e:
+                self.linkState = 0
+                print(str(e))
+            else:
+                self.linkState = 1
+
+    # ---- 关闭 -----------------------------------------------------
+    def close_inst(self):
+        try:
+            # cmd = 'OUTP OFF'
+            # str_temp = self.send_cmd(cmd)
+
+            str_temp = str(self.instance.close())
+            return str_temp
+        except Exception as e:
+            return str(e)
+
+    # ---- MARK -----------------------------------------------------
     # 频段内增益测试方法，设置CENTERFREQ（MARK点频率坐标）、SPANFREQ（扫描频率宽度）参数，
     # 返回值为'<mag>'：MARK点的功率值，其余返回值详见错误代码表
     def mark_data(self,CENTERFREQ, SPANFREQ):
@@ -387,7 +422,7 @@ class RSFSx:
         try:
             instance = rm1.open_resource(self.tcp_addr)
         except BaseException:
-            return '-1：连接矢网超时'
+            return '-1：连接 频谱仪 超时'
         for line in lines:
             if (line.find('@') > 0):
                 instr = line[:line.index('@')]
@@ -431,7 +466,7 @@ class RSFSx:
                             if cmd_real.strip()[-1] == '?':              # 查询命令
                                 rt_v = self.instance.query(cmd_real)
                                 print("query: %s" % str(cmd_real).strip())
-                            else:                               # 配置命令
+                            else:                                       # 配置命令
                                 print("set: %s" % str(cmd_real).strip())
                                 rt_v = self.instance.write(cmd_real)
 
@@ -484,7 +519,6 @@ class RSRFSin:
     # ---- 关闭 ---------------------------------------------------------------------
     def close_inst(self):
         try:
-            str_temp = ''
             cmd = 'OUTP OFF'
             str_temp = self.send_cmd(cmd)
 

@@ -1,0 +1,147 @@
+INIT			// 初始化
+*WAI			// 等待
+
+DISP:FORM SPL	
+
+SYST:DISP:UPD ON			// 打开 实时显示
+SYST:DISP:UPD OFF			// 关闭 实时显示
+
+INIT:CONT ON				// 连续扫描
+INIT:CONT OFF				// 单次扫描
+INIT:CONT OFF				// 单次扫描
+
+*************************************************************************
+DISP:TRAC1:MODE WRIT	// 打开 TRACE1，clear write 模式
+#DISP:TRAC1 OFF			// 关闭 TRACE1
+
+DISP:TRAC2:PERS ON			// 打开 TRACE2
+DISP:TRAC1:PERS:DEC 2s		// 
+
+
+*************************************************************************
+*RST 0
+#SYST:DISP:UPD OFF			// 打开 实时显示
+SYST:DISP:UPD ON			// 打开 实时显示
+DISP:FORM SPL
+#INIT:CONT OFF
+#INIT:CONT ON
+
+DISP:TRAC1:MODE WRIT
+#DISP:TRAC1 OFF			// 关闭 TRACE1
+INIT
+*WAI
+
+DISP:TRAC1:PERS OFF			// 打开 TRACE2
+DISP:TRAC2:PERS OFF			// 打开 TRACE2
+#DISP:TRAC1:PERS:DEC 2s
+
+*************************************************************************
+#*RST
+DISP:WIND1:TRAC1 ON
+INST SAN
+FREQ:CENT 1.2 GHz
+FREQ:SPAN 5 MHz
+CALC1:MARK1 ON
+CALC1:MARK1:TRAC 1
+CALC1:MARK1:X 1.2 GHz
+CALC1:MARK1:Y?
+
+#DISP:WIND1:TRAC1 ON
+*************************************************************************
+刘子恒代码
+
+INST SAN
+FREQ:CENT 1.2 GHz
+FREQ:SPAN 5 MHz
+CALC1:MARK1 ON
+CALC1:MARK1:TRAC 1
+CALC1:MARK1:X 1.2 GHz
+CALC1:MARK1:Y?
+
+*************************************************************************
+*RST
+
+INST SAN
+SYST:DISP:UPD ON			// 打开 实时显示
+FREQ:CENT 1.2 GHz
+FREQ:SPAN 5 MHz
+CALC1:MARK1 ON
+CALC1:MARK1:TRAC 1
+CALC1:MARK1:X 1.2 GHz
+CALC1:MARK1:Y?
+DISP:WIND1:TRAC1 ON
+
+
+SYST:KLOC
+DISP:TRAC:Y:RPOS 50PCT
+
+
+
+#DISP:TRAC1:Y:SCAL:AUTO ONCE
+#DISP:TRAC1:Y:AUTO ONCE
+#DISP:TRAC:Y:SCAL:RLEV -30
+#SENS:ADJ:SCAL:Y:AUTO ON
+
+#DISP:TRAC:Y:SCAL:RLEV -40
+DISP:TRAC:Y:RPOS 90PCT
+DISP:TRAC1:Y:SCAL:AUTO ONCE
+
+
+-----------------------------
+5月4日
+
+*RST
+
+INST SAN
+SYST:DISP:UPD ON			// 打开 实时显示
+FREQ:CENT 1.2 GHz
+FREQ:SPAN 5 MHz
+CALC1:MARK1 ON
+CALC1:MARK1:TRAC 1
+CALC1:MARK1:X 1.2 GHz
+CALC1:MARK1:Y?
+DISP:WIND1:TRAC1 ON
+
+ADJ:LEV
+
+DISP:TRAC1:Y:SCAL:AUTO ONCE
+
+
+
+CALC1:MARK1 ON					// 显示 MARK1
+CALC1:MARK1:TRAC 1				// 使用 TRACE1
+CALC1:MARK1:X 1.199 GHz			// MARK1 频率 1.2G
+CALC1:MARK1:Y?					// 获取 Y （功率值）
+
+CALC1:MARK2 ON					// 显示 MARK1
+CALC1:MARK2:TRAC 1				// 使用 TRACE1
+CALC1:MARK2:MAX				// MARK1 频率 1.2G
+CALC1:MARK2:Y?					// 获取 Y （功率值）
+
+CALC1:MARK3 ON					// 显示 MARK1
+CALC1:MARK3:TRAC 1				// 使用 TRACE1
+CALC1:MARK3:MAX:RITHT			// MARK1 频率 1.2G
+CALC1:MARK3:Y?					// 获取 Y （功率值）
+
+**********************************************************
+2020年5月4日		成功
+
+*RST							// 恢复出厂
+SYST:DISP:UPD ON				// 打开 实时显示	P589
+
+FREQ:CENT 1.2 GHz				// 设置中心频率 1.2 GHz
+FREQ:SPAN 5 MHz					// SPAN = 5MHz
+
+ADJ:LEV							// 电平自动调整
+*OPC?							// 暂停，直到返回 1（非常有用，机器自己延时）
+DISP:TRAC1:Y:AUTO ONCE			// Y 轴刻度自动设置一次
+
+CALC1:MARK1 ON					// 显示 MARK1
+CALC1:MARK1:TRAC 1				// 使用 TRACE1
+CALC1:MARK1:MAX					// MARK2 最大峰值
+CALC1:MARK1:Y?					// 获取 Y （功率值）
+
+CALC1:MARK3 ON					// 显示 MARK1
+CALC1:MARK3:TRAC 1				// 使用 TRACE1
+CALC1:MARK3:MAX:RITHT			// MARK1 频率 1.2G
+CALC1:MARK3:Y?					// 获取 Y （功率值）
