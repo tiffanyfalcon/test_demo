@@ -14,8 +14,8 @@ from view.ui_main_init import MyWindow
 # import view.ui_main
 
 
-str_version         = " V1.06"
-str_date            = " 2020-05-01"
+str_version         = " V1.07"
+str_date            = " 2020-05-05"
 str_auther          = " ChenXudong"
 str_company         = " Xian BRJX"
 str_software_name   = " Near Feild Test"

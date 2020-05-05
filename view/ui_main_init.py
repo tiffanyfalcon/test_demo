@@ -123,7 +123,9 @@ class MyWindow(QMainWindow, Ui_MainWindow ):
 
         # Excel
         self.myExcel.open_file()
-        self.myExcel.print_rows('Sheet1')
+        # self.myExcel.print_rows('Sheet1')
+        my_list = self.myExcel.print_rows1('Sheet1', 0, 3)
+        print(my_list)
 
     def te_append_text(self, msg):
         self.textEdit.append(msg)

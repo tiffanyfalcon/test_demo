@@ -72,3 +72,48 @@ class MyExcel:
         else:
             pass
 
+    # ---- 获取表格到 DICT --------------------------------
+    #
+    # def print_rows1(self, sheet_name, start_col, stop_col) -> dict:
+    def print_rows1(self, sheet_name, start_col, stop_col) -> list:
+        """
+        :param sheet_name: 路径及文件名
+        :param start_col: 起始列
+        :param stop_col: 结束列
+        :return: list:[{sn:xx}, {pow:xx}, {pha:xx}, {}, ...]
+        """
+
+        global wb
+
+        my_list = []
+
+        try:
+            ws = wb.get_sheet_by_name(sheet_name)
+
+            my_dict = {}
+            i = 0
+            # for row in list(ws.iter_rows())[start_col:stop_col]:
+            # print(ws.iter_rows().count)
+
+            for row in ws.iter_rows():
+                i += 1
+                # print('i = %d' % i, end='\t')
+                if i > 1:
+                    my_dict['sn']   = row[start_col].value
+                    my_dict['pow']  = row[start_col + 1].value
+                    my_dict['pha']  = row[start_col + 2].value
+
+                    my_list.append(my_dict.copy())
+                    my_dict.clear()
+
+                    # print('i=' + str(i) + '\t' + 'val=' + str(cell.value), end='\t')
+                    # print(cell._bind_value, end='\t')
+
+            # print(my_list)
+
+        except Exception as e:
+            print(str(e))
+            return -1
+        else:
+            return my_list
+
